@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Optional;
 
 @Getter
-public class UserRequestDto {
+public class UserCreateRequestDto {
     private String email;
     private String password;
     private String type;

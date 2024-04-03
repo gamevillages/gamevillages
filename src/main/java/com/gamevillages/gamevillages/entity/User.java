@@ -1,6 +1,6 @@
 package com.gamevillages.gamevillages.entity;
 
-import com.gamevillages.gamevillages.dto.UserRequestDto;
+import com.gamevillages.gamevillages.dto.UserCreateRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,10 +31,10 @@ public class User extends  Timestamped {
     @Column(name = "name")
     private String name;
 
-    public User(UserRequestDto userRequestDto){
-        this.email = userRequestDto.getEmail();
-        this.password = userRequestDto.getPassword();
-        this.type = userRequestDto.getType();
-        this.name = String.valueOf(userRequestDto.getName());
+    public User(UserCreateRequestDto userCreateRequestDto){
+        this.email = userCreateRequestDto.getEmail();
+        this.password = userCreateRequestDto.getPassword();
+        this.type = userCreateRequestDto.getType();
+        this.name = String.valueOf(userCreateRequestDto.getName());
     }
 }

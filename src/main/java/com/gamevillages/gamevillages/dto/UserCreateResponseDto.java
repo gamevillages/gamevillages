@@ -2,12 +2,14 @@ package com.gamevillages.gamevillages.dto;
 
 import com.gamevillages.gamevillages.entity.User;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Getter
-public class UserResponseDto {
+@Setter
+public class UserCreateResponseDto {
     private String id;
     private String email;
     private String type ;
@@ -15,8 +17,9 @@ public class UserResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+    private String sessionKey;
 
-    public UserResponseDto(User user){
+    public UserCreateResponseDto(User user){
         this.id = user.getId();
         this.name = user.getName().describeConstable();
         this.email = user.getEmail();
