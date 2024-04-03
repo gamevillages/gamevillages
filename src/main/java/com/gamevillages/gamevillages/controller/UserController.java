@@ -2,9 +2,16 @@ package com.gamevillages.gamevillages.controller;
 
 import com.gamevillages.gamevillages.dto.*;
 import com.gamevillages.gamevillages.serivce.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.UnknownHostException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -13,6 +20,9 @@ public class UserController {
     public UserController(UserService userService){
         this.userService = userService;
     }
+
+    @Autowired
+    private HttpServletRequest request;
 
     @PostMapping("/email")
     public ResponseEntity<?> sendEmail(@RequestBody UserEmailRequestDto userEmailRequestDto){
@@ -48,10 +58,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginRequestDto userLoginRequestDto){
         try{
-            UserLoginResponseDto userLoginResponseDto = userService.loginUser(userLoginRequestDto);
+
+            UserLoginResponseDto userLoginResponseDto = userService.loginUser(userLoginRequestDto, request.getRemoteAddr());
             return ResponseEntity.ok(userLoginResponseDto);
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (UnknownHostException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }
