@@ -24,21 +24,28 @@ public class UserService {
 
     public UserService(UserRepository userRepository){this.userRepository = userRepository;}
 
-    public UserEmailDto sendEmail(UserEmailDto userEmailRequestDto) {
+    public UserEmailResponseDto sendEmail(UserEmailRequestDto userEmailRequestDto) {
 
         // 이메일 중복 검사
         User findUser = userRepository.findUserByEmail(userEmailRequestDto.getEmail());
         if(findUser != null){
-            throw new RuntimeException("이미 해당 이메일을 사용하는 사용자가 존재합니다.");
+            throw new RuntimeException("User already Exists.");
         }
 
         String randomNumber = generateRandomNumbers();
 
         // 인증 번호 메일 발송
         try {
+            String ko = "[Game Villages] 인증번호를 확인해 주세요";
+            String en = "[Game Villages] Please check your verify number";
+
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(userEmailRequestDto.getEmail());
-            message.setSubject("[Game Villages] 인증번호를 확인해 주세요");
+            if (userEmailRequestDto.getClientLanguage().equals("ko")){
+                message.setSubject(ko);
+            } else {
+                message.setSubject(en);
+            }
             message.setText(randomNumber);
             emailSender.send(message);
         } catch (Exception e) {
@@ -46,13 +53,15 @@ public class UserService {
         }
 
         GamevillagesApplication.jedis.setex("randomNumber_"+userEmailRequestDto.getEmail(), 300, randomNumber);
-        return userEmailRequestDto;
+        UserEmailResponseDto userEmailResponseDto = new UserEmailResponseDto();
+        userEmailResponseDto.setEmail(userEmailRequestDto.getEmail());
+        return userEmailResponseDto;
     }
 
     public UserVerifyNumberResponseDto verifyNumber(UserVerifyNumberRequestDto userVerifyNumberRequestDto) {
         String redisNumber = GamevillagesApplication.jedis.get("randomNumber_"+userVerifyNumberRequestDto.getEmail());
-        if (!redisNumber.equals(userVerifyNumberRequestDto.getVerifyNumber())){
-            throw new RuntimeException("인증번호가 유효하지 않습니다.");
+        if (redisNumber == null && !redisNumber.equals(userVerifyNumberRequestDto.getVerifyNumber())){
+            throw new RuntimeException("Verify Number is not vaild.");
         }
         GamevillagesApplication.jedis.setex("verified_" + userVerifyNumberRequestDto.getEmail(), 600, "true");
         UserVerifyNumberResponseDto userVerifyNumberResponseDto = new UserVerifyNumberResponseDto();
@@ -65,7 +74,7 @@ public class UserService {
 
         // 이메일 인증 확인
         if(!GamevillagesApplication.jedis.get("verified_" + userCreateRequestDto.getEmail()).equals("true")){
-            throw new RuntimeException("이메일 인증이 유효하지 않습니다.");
+            throw new RuntimeException("Verification is not valid.");
         }
 
         // 비밀번호 해싱 : Argon2
@@ -89,13 +98,13 @@ public class UserService {
         // 유저 찾기
         User findUser = userRepository.findUserByEmail(userLoginRequestDto.getEmail());
         if(findUser == null) {
-            throw new RuntimeException("로그인 오류가 발생하였습니다. 아이디와 비밀번호를 확인해 주세요.");
+            throw new RuntimeException("Login Error.");
         }
 
         // 비밀번호 검증
         Boolean verifiedPassword = argon2.verify(findUser.getPassword(), userLoginRequestDto.getPassword());
         if (!verifiedPassword) {
-            throw new RuntimeException("로그인 오류가 발생하였습니다. 아이디와 비밀번호를 확인해 주세요.");
+            throw new RuntimeException("Login Error.");
         }
 
         UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto(findUser);
@@ -113,6 +122,7 @@ public class UserService {
         return sessionKey;
     }
 
+    // 인증 번호 생성 메서드
     public static String generateRandomNumbers() {
         StringBuilder result = new StringBuilder();
         Random random = new Random();

@@ -15,9 +15,9 @@ public class UserController {
     }
 
     @PostMapping("/email")
-    public ResponseEntity<?> sendEmail(@RequestBody UserEmailDto userEmailRequestDto){
+    public ResponseEntity<?> sendEmail(@RequestBody UserEmailRequestDto userEmailRequestDto){
         try{
-            UserEmailDto userEmailResponseDto = userService.sendEmail(userEmailRequestDto);
+            UserEmailResponseDto userEmailResponseDto = userService.sendEmail(userEmailRequestDto);
             return ResponseEntity.ok(userEmailResponseDto);
         } catch (RuntimeException ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
