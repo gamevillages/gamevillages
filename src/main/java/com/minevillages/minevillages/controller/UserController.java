@@ -81,7 +81,17 @@ public class UserController {
             userService.deleteUser(request.getHeader("Authorization"));
             return ResponseEntity.ok("Delete User Success");
         } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());}
-         }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
 
+    @PostMapping("/logout")
+    public  ResponseEntity<?> logout(){
+        try{
+            userService.logout(request.getHeader("Authorization"));
+            return ResponseEntity.ok("Logout Success");
+        }catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
 }

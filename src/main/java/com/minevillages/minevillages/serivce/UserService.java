@@ -170,6 +170,10 @@ public class UserService {
 
     public UserUpdateResponseDto updateUserName(String authorization, UserUpdateRequestDto userUpdateRequestDto) {
         String userId = MinevillagesApplication.jedis.get(authorization);
+        User findUser = userRepository.findUserByIdAndDeletedAtIsNull(userId);
+        if (findUser == null){
+            throw new RuntimeException("No User Exists");
+        }
         User resultUser = userRepository.updateUserNameById(userId, userUpdateRequestDto.getName());
         UserUpdateResponseDto userUpdateResponseDto = new UserUpdateResponseDto(resultUser);
         return userUpdateResponseDto;
@@ -178,6 +182,15 @@ public class UserService {
 
     public void deleteUser(String authorization) {
         String userId = MinevillagesApplication.jedis.get(authorization);
+        MinevillagesApplication.jedis.del(authorization);
+        User findUser = userRepository.findUserByIdAndDeletedAtIsNull(userId);
+        if (findUser == null) {
+            throw new RuntimeException("No User Exists");
+        }
         userRepository.deleteUserById(userId);
+    }
+
+    public void logout(String authorization) {
+        MinevillagesApplication.jedis.del(authorization);
     }
 }
