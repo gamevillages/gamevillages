@@ -1,10 +1,10 @@
-package com.gamevillages.gamevillages;
+package com.minevillages.minevillages;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GamevillagesApplicationTests {
+class MinevillagesApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,6 +1,6 @@
-package com.gamevillages.gamevillages.entity;
+package com.minevillages.minevillages.entity;
 
-import com.gamevillages.gamevillages.dto.UserCreateRequestDto;
+import com.minevillages.minevillages.dto.UserCreateRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

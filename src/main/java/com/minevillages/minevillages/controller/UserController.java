@@ -1,7 +1,7 @@
-package com.gamevillages.gamevillages.controller;
+package com.minevillages.minevillages.controller;
 
-import com.gamevillages.gamevillages.dto.*;
-import com.gamevillages.gamevillages.serivce.UserService;
+import com.minevillages.minevillages.dto.*;
+import com.minevillages.minevillages.serivce.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

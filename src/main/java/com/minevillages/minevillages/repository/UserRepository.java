@@ -1,6 +1,6 @@
-package com.gamevillages.gamevillages.repository;
+package com.minevillages.minevillages.repository;
 
-import com.gamevillages.gamevillages.entity.User;
+import com.minevillages.minevillages.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, String> {

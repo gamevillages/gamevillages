@@ -1,4 +1,4 @@
-package com.gamevillages.gamevillages.dto;
+package com.minevillages.minevillages.dto;
 
 import lombok.Getter;
 import lombok.Setter;

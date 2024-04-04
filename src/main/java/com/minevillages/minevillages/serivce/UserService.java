@@ -1,9 +1,9 @@
-package com.gamevillages.gamevillages.serivce;
+package com.minevillages.minevillages.serivce;
 
-import com.gamevillages.gamevillages.GamevillagesApplication;
-import com.gamevillages.gamevillages.dto.*;
-import com.gamevillages.gamevillages.entity.User;
-import com.gamevillages.gamevillages.repository.UserRepository;
+import com.minevillages.minevillages.MinevillagesApplication;
+import com.minevillages.minevillages.dto.*;
+import com.minevillages.minevillages.entity.User;
+import com.minevillages.minevillages.repository.UserRepository;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +40,8 @@ public class UserService {
 
         // 인증 번호 메일 발송
         try {
-            String ko = "[Game Villages] 인증번호를 확인해 주세요";
-            String en = "[Game Villages] Please check your verify number";
+            String ko = "[Mine Villages] 인증번호를 확인해 주세요";
+            String en = "[Mine Villages] Please check your verify number";
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(userEmailRequestDto.getEmail());
@@ -56,18 +56,18 @@ public class UserService {
             throw new RuntimeException(e.getMessage());
         }
 
-        GamevillagesApplication.jedis.setex("randomNumber_" + userEmailRequestDto.getEmail(), 300, randomNumber);
+        MinevillagesApplication.jedis.setex("randomNumber_" + userEmailRequestDto.getEmail(), 300, randomNumber);
         UserEmailResponseDto userEmailResponseDto = new UserEmailResponseDto();
         userEmailResponseDto.setEmail(userEmailRequestDto.getEmail());
         return userEmailResponseDto;
     }
 
     public UserVerifyNumberResponseDto verifyNumber(UserVerifyNumberRequestDto userVerifyNumberRequestDto) {
-        String redisNumber = GamevillagesApplication.jedis.get("randomNumber_" + userVerifyNumberRequestDto.getEmail());
+        String redisNumber = MinevillagesApplication.jedis.get("randomNumber_" + userVerifyNumberRequestDto.getEmail());
         if (redisNumber == null && !redisNumber.equals(userVerifyNumberRequestDto.getVerifyNumber())) {
             throw new RuntimeException("Verify Number is not vaild.");
         }
-        GamevillagesApplication.jedis.setex("verified_" + userVerifyNumberRequestDto.getEmail(), 600, "true");
+        MinevillagesApplication.jedis.setex("verified_" + userVerifyNumberRequestDto.getEmail(), 600, "true");
         UserVerifyNumberResponseDto userVerifyNumberResponseDto = new UserVerifyNumberResponseDto();
         userVerifyNumberResponseDto.setEmail(userVerifyNumberRequestDto.getEmail());
         return userVerifyNumberResponseDto;
@@ -77,7 +77,7 @@ public class UserService {
         User user = new User(userCreateRequestDto);
 
         // 이메일 인증 확인
-        if (!GamevillagesApplication.jedis.get("verified_" + userCreateRequestDto.getEmail()).equals("true")) {
+        if (!MinevillagesApplication.jedis.get("verified_" + userCreateRequestDto.getEmail()).equals("true")) {
             throw new RuntimeException("Verification is not valid.");
         }
 
@@ -108,7 +108,7 @@ public class UserService {
         // 비밀번호 검증
         Boolean verifiedPassword = argon2.verify(findUser.getPassword(), userLoginRequestDto.getPassword());
         if (!verifiedPassword) {
-            String countString = GamevillagesApplication.jedis.get("illegalCount_" + userLoginRequestDto.getEmail());
+            String countString = MinevillagesApplication.jedis.get("illegalCount_" + userLoginRequestDto.getEmail());
             int count = 1;
             if (countString != null) {
                 count += Integer.valueOf(countString);
@@ -119,12 +119,12 @@ public class UserService {
                 illegalAtDto.setIp(ip);
                 LocalDateTime now = LocalDateTime.now();
                 illegalAtDto.setDatetime(now);
-                GamevillagesApplication.jedis.set("illegalAt_" + userLoginRequestDto.getEmail(), String.valueOf(illegalAtDto));
+                MinevillagesApplication.jedis.set("illegalAt_" + userLoginRequestDto.getEmail(), String.valueOf(illegalAtDto));
 
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(userLoginRequestDto.getEmail());
-                String ko = "[Game Villages] 계정에 비정상적인 접근이 있습니다";
-                String en = "[Game Villages] Illegal Access To Account";
+                String ko = "[Mine Villages] 계정에 비정상적인 접근이 있습니다";
+                String en = "[Mine Villages] Illegal Access To Account";
 
                 if (userLoginRequestDto.getClientLanguage().equals("ko")) {
                     message.setSubject(ko);
@@ -135,11 +135,11 @@ public class UserService {
                 }
                 emailSender.send(message);
             }
-            GamevillagesApplication.jedis.set("illegalCount_" + userLoginRequestDto.getEmail(), String.valueOf(count));
+            MinevillagesApplication.jedis.set("illegalCount_" + userLoginRequestDto.getEmail(), String.valueOf(count));
             throw new RuntimeException("Login Error.");
         }
-        GamevillagesApplication.jedis.del("illegalCount_" + userLoginRequestDto.getEmail());
-        GamevillagesApplication.jedis.del("illegalAt_" + userLoginRequestDto.getEmail());
+        MinevillagesApplication.jedis.del("illegalCount_" + userLoginRequestDto.getEmail());
+        MinevillagesApplication.jedis.del("illegalAt_" + userLoginRequestDto.getEmail());
         UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto(findUser);
         String sessionKey = generateSessionKey(findUser.getId());
         userLoginResponseDto.setSessionKey(sessionKey);
@@ -151,7 +151,7 @@ public class UserService {
     // 세션 키 생성 메서드
     public String generateSessionKey(String userId) {
         String sessionKey = UUID.randomUUID().toString();
-        GamevillagesApplication.jedis.setex(sessionKey, 3600, userId);
+        MinevillagesApplication.jedis.setex(sessionKey, 3600, userId);
         return sessionKey;
     }
 

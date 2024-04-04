@@ -1,4 +1,4 @@
-package com.gamevillages.gamevillages.entity;
+package com.minevillages.minevillages.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

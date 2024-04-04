@@ -1,6 +1,6 @@
-package com.gamevillages.gamevillages.dto;
+package com.minevillages.minevillages.dto;
 
-import com.gamevillages.gamevillages.entity.User;
+import com.minevillages.minevillages.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class UserCreateResponseDto {
+public class UserLoginResponseDto {
     private String id;
     private String email;
     private String type ;
@@ -18,8 +18,7 @@ public class UserCreateResponseDto {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
     private String sessionKey;
-
-    public UserCreateResponseDto(User user){
+    public UserLoginResponseDto(User user){
         this.id = user.getId();
         this.name = user.getName().describeConstable();
         this.email = user.getEmail();
@@ -29,3 +28,5 @@ public class UserCreateResponseDto {
         this.deletedAt = user.getDeletedAt();
     }
 }
+
+
