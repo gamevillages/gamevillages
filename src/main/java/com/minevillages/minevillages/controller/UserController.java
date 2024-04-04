@@ -21,6 +21,11 @@ public class UserController {
     @Autowired
     private HttpServletRequest request;
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck(){
+        return ResponseEntity.ok("User service is healthy");
+    }
+
     @PostMapping("/email")
     public ResponseEntity<?> sendEmail(@RequestBody UserEmailRequestDto userEmailRequestDto){
         try{
