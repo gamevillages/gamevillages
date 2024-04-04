@@ -98,18 +98,18 @@ public class UserService {
         return userCreateResponseDto;
     }
 
-    public UserLoginResponseDto loginUser(UserLoginRequestDto userLoginRequestDto, String ip) throws UnknownHostException {
+    public UserSigninResponseDto signinUser(UserSigninRequestDto userSigninRequestDto, String ip) throws UnknownHostException {
 
         // 유저 찾기
-        User findUser = userRepository.findUserByEmailAndDeletedAtIsNull(userLoginRequestDto.getEmail());
+        User findUser = userRepository.findUserByEmailAndDeletedAtIsNull(userSigninRequestDto.getEmail());
         if (findUser == null) {
-            throw new RuntimeException("Login Error.");
+            throw new RuntimeException("Signin Error.");
         }
 
         // 비밀번호 검증
-        Boolean verifiedPassword = argon2.verify(findUser.getPassword(), userLoginRequestDto.getPassword());
+        Boolean verifiedPassword = argon2.verify(findUser.getPassword(), userSigninRequestDto.getPassword());
         if (!verifiedPassword) {
-            String countString = MinevillagesApplication.jedis.get("illegalCount_" + userLoginRequestDto.getEmail());
+            String countString = MinevillagesApplication.jedis.get("illegalCount_" + userSigninRequestDto.getEmail());
             int count = 1;
             if (countString != null) {
                 count += Integer.valueOf(countString);
@@ -120,14 +120,14 @@ public class UserService {
                 illegalAtDto.setIp(ip);
                 LocalDateTime now = LocalDateTime.now();
                 illegalAtDto.setDatetime(now);
-                MinevillagesApplication.jedis.set("illegalAt_" + userLoginRequestDto.getEmail(), String.valueOf(illegalAtDto));
+                MinevillagesApplication.jedis.set("illegalAt_" + userSigninRequestDto.getEmail(), String.valueOf(illegalAtDto));
 
                 SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(userLoginRequestDto.getEmail());
+                message.setTo(userSigninRequestDto.getEmail());
                 String ko = "[Mine Villages] 계정에 비정상적인 접근이 있습니다";
                 String en = "[Mine Villages] Illegal Access To Account";
 
-                if (userLoginRequestDto.getClientLanguage().equals("ko")) {
+                if (userSigninRequestDto.getClientLanguage().equals("ko")) {
                     message.setSubject(ko);
                     message.setText("IP" + ip  + "주소에서 " + now + "에 비정상적인 접근이 확인되었습니다.");
                 } else {
@@ -136,16 +136,16 @@ public class UserService {
                 }
                 emailSender.send(message);
             }
-            MinevillagesApplication.jedis.set("illegalCount_" + userLoginRequestDto.getEmail(), String.valueOf(count));
-            throw new RuntimeException("Login Error.");
+            MinevillagesApplication.jedis.set("illegalCount_" + userSigninRequestDto.getEmail(), String.valueOf(count));
+            throw new RuntimeException("Signin Error.");
         }
-        MinevillagesApplication.jedis.del("illegalCount_" + userLoginRequestDto.getEmail());
-        MinevillagesApplication.jedis.del("illegalAt_" + userLoginRequestDto.getEmail());
-        UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto(findUser);
+        MinevillagesApplication.jedis.del("illegalCount_" + userSigninRequestDto.getEmail());
+        MinevillagesApplication.jedis.del("illegalAt_" + userSigninRequestDto.getEmail());
+        UserSigninResponseDto userSigninResponseDto = new UserSigninResponseDto(findUser);
         String sessionKey = generateSessionKey(findUser.getId());
-        userLoginResponseDto.setSessionKey(sessionKey);
+        userSigninResponseDto.setSessionKey(sessionKey);
 
-        return userLoginResponseDto;
+        return userSigninResponseDto;
 
     }
 

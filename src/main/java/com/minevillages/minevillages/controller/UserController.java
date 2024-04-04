@@ -52,12 +52,12 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginRequestDto userLoginRequestDto){
+    @PostMapping("/signin")
+    public ResponseEntity<?> signin(@RequestBody UserSigninRequestDto userSigninRequestDto){
         try{
 
-            UserLoginResponseDto userLoginResponseDto = userService.loginUser(userLoginRequestDto, request.getRemoteAddr());
-            return ResponseEntity.ok(userLoginResponseDto);
+            UserSigninResponseDto userSigninResponseDto = userService.signinUser(userSigninRequestDto, request.getRemoteAddr());
+            return ResponseEntity.ok(userSigninResponseDto);
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } catch (UnknownHostException e) {

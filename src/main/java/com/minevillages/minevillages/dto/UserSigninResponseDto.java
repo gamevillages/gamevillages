@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class UserLoginResponseDto {
+public class UserSigninResponseDto {
     private String id;
     private String email;
     private String type ;
@@ -18,7 +18,7 @@ public class UserLoginResponseDto {
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
     private String sessionKey;
-    public UserLoginResponseDto(User user){
+    public UserSigninResponseDto(User user){
         this.id = user.getId();
         this.name = user.getName().describeConstable();
         this.email = user.getEmail();
