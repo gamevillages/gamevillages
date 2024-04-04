@@ -31,7 +31,7 @@ public class UserService {
     public UserEmailResponseDto sendEmail(UserEmailRequestDto userEmailRequestDto) {
 
         // 이메일 중복 검사
-        User findUser = userRepository.findUserByEmail(userEmailRequestDto.getEmail());
+        User findUser = userRepository.findUserByEmailAndDeletedAtIsNull(userEmailRequestDto.getEmail());
         if (findUser != null) {
             throw new RuntimeException("User already Exists.");
         }
@@ -82,9 +82,10 @@ public class UserService {
         }
 
         // 비밀번호 해싱 : Argon2
-
         String hashedPassword = argon2.hash(10, 65536, 1, user.getPassword());
         user.setPassword(hashedPassword);
+
+        user.setCreatedAt(LocalDateTime.now());
 
         User saveUser = userRepository.save(user);
 
@@ -100,7 +101,7 @@ public class UserService {
     public UserLoginResponseDto loginUser(UserLoginRequestDto userLoginRequestDto, String ip) throws UnknownHostException {
 
         // 유저 찾기
-        User findUser = userRepository.findUserByEmail(userLoginRequestDto.getEmail());
+        User findUser = userRepository.findUserByEmailAndDeletedAtIsNull(userLoginRequestDto.getEmail());
         if (findUser == null) {
             throw new RuntimeException("Login Error.");
         }
@@ -167,6 +168,16 @@ public class UserService {
         return result.toString();
     }
 
+    public UserUpdateResponseDto updateUserName(String authorization, UserUpdateRequestDto userUpdateRequestDto) {
+        String userId = MinevillagesApplication.jedis.get(authorization);
+        User resultUser = userRepository.updateUserNameById(userId, userUpdateRequestDto.getName());
+        UserUpdateResponseDto userUpdateResponseDto = new UserUpdateResponseDto(resultUser);
+        return userUpdateResponseDto;
+    }
 
 
+    public void deleteUser(String authorization) {
+        String userId = MinevillagesApplication.jedis.get(authorization);
+        userRepository.deleteUserById(userId);
+    }
 }
