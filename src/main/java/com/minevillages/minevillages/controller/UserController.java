@@ -99,4 +99,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getUser(){
+        try{
+            UserResponseDto userResponseDto = userService.getUser(request.getHeader("Authorization"));
+            return ResponseEntity.ok(userResponseDto);
+        }catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/name")
+    public ResponseEntity<?> getName(){
+        try{
+            UserNameResponseDto userNameResponseDto = userService.getName(request.getHeader("Authorization"));
+            return ResponseEntity.ok(userNameResponseDto);
+        }catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
 }

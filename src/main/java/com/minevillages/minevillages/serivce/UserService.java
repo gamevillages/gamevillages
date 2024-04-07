@@ -193,4 +193,24 @@ public class UserService {
     public void logout(String authorization) {
         MinevillagesApplication.jedis.del(authorization);
     }
+
+    public UserResponseDto getUser(String authorization) {
+        String userId = MinevillagesApplication.jedis.get(authorization);
+        User findUser = userRepository.findUserByIdAndDeletedAtIsNull(userId);
+        if (findUser == null) {
+            throw new RuntimeException("No User Exists");
+        }
+        return new UserResponseDto(findUser);
+    }
+
+    public UserNameResponseDto getName(String authorization) {
+        String userId = MinevillagesApplication.jedis.get(authorization);
+        User findUser = userRepository.findUserByIdAndDeletedAtIsNull(userId);
+        if (findUser == null) {
+            throw new RuntimeException("No User Exists");
+        }
+        UserNameResponseDto userNameResponseDto = new UserNameResponseDto();
+        userNameResponseDto.setName(findUser.getName());
+        return  userNameResponseDto;
+    }
 }
