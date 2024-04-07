@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 
 @RestController
 @RequestMapping("/api/user")
+@CrossOrigin(origins = "http://127.0.0.1:3000")
 public class UserController {
     private final UserService userService;
     public UserController(UserService userService){
