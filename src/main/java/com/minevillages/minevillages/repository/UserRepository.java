@@ -4,10 +4,13 @@ import com.minevillages.minevillages.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, String> {
     User findUserByEmailAndDeletedAtIsNull(String email);
     User findUserByIdAndDeletedAtIsNull(String id);
+
+    List<User> findByDeletedAtIsNull();
 
     default void deleteUserById(String id){
         findById(id).ifPresent(user ->{

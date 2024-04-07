@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -209,8 +211,20 @@ public class UserService {
         if (findUser == null) {
             throw new RuntimeException("No User Exists");
         }
-        UserNameResponseDto userNameResponseDto = new UserNameResponseDto();
-        userNameResponseDto.setName(findUser.getName());
+        UserNameResponseDto userNameResponseDto = new UserNameResponseDto(findUser);
         return  userNameResponseDto;
+    }
+
+    public List<UserNameResponseDto> getUserList(String authorization) {
+        loginChecker(authorization);
+        List<User> userList =  userRepository.findByDeletedAtIsNull();
+        return userList.stream().map (user -> new UserNameResponseDto(user)).collect(Collectors.toList());
+    }
+
+    public void loginChecker (String authorization){
+        String userId = MinevillagesApplication.jedis.get(authorization);
+        if (userId.isEmpty()){
+            throw new RuntimeException("Authorization not valid");
+        }
     }
 }

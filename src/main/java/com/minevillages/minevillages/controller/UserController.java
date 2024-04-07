@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -116,6 +117,16 @@ public class UserController {
         try{
             UserNameResponseDto userNameResponseDto = userService.getName(request.getHeader("Authorization"));
             return ResponseEntity.ok(userNameResponseDto);
+        }catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/list")
+    public  ResponseEntity<?> getList(){
+        try{
+            List<UserNameResponseDto> userList = userService.getUserList(request.getHeader("Authorization"));
+            return ResponseEntity.ok(userList);
         }catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
